@@ -16,7 +16,7 @@ public class LocalVolley {
         sRequestQueue = Volley.newRequestQueue(context);
     }
 
-    public static RequestQueue getsRequestQueue() {
+    public static RequestQueue getRequestQueue() {
         if (sRequestQueue != null) {
             return sRequestQueue;
         } else {
