@@ -33,8 +33,10 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
@@ -88,18 +90,21 @@ public class VolleyFragment extends Fragment {
             @Override
             public ObservableSource<? extends JSONObject> call() throws Exception {
                 try {
-                    return Observable.just(getRouteData());
-                } catch (Exception e) {
+                    return Observable.just(getData());
+                } catch (InterruptedException e) {
+                    log("error : " + e.getMessage());
                     return Observable.error(e);
+                } catch (ExecutionException e) {
+                    log("error : " + e.getCause());
+                    return Observable.error(e.getCause());
                 }
             }
         });
     }
 
-    private JSONObject getRouteData() throws ExecutionException, InterruptedException {
+    private JSONObject getData() throws ExecutionException, InterruptedException {
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
-        String url = "http://www.weather.com.cn/adat/sk/101010100.html";
-//        String url = "http://www.google.com";
+        String url = "http://ip.jsontest.com/";
         JsonObjectRequest req = new JsonObjectRequest(url, null, future, future);
         LocalVolley.getRequestQueue().add(req);
         return future.get();
@@ -115,27 +120,7 @@ public class VolleyFragment extends Fragment {
 
             @Override
             public void onError(Throwable t) {
-
                 log(t.toString());
-            }
-
-            @Override
-            public void onComplete() {
-                log("complete");
-            }
-        };
-    }
-
-    private DisposableSubscriber<JSONObject> getSubscriber() {
-        return new DisposableSubscriber<JSONObject>() {
-            @Override
-            public void onNext(JSONObject jsonObject) {
-                log(" >> " + jsonObject.toString());
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                log("error");
             }
 
             @Override
