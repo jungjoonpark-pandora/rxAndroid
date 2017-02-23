@@ -3,16 +3,11 @@ package com.pandora.rxandroid.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.pandora.rxandroid.R;
@@ -21,7 +16,6 @@ import com.pandora.rxandroid.volley.LocalVolley;
 
 import org.json.JSONObject;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,13 +27,10 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subscribers.DisposableSubscriber;
 
 
 public class VolleyFragment extends Fragment {
@@ -52,7 +43,7 @@ public class VolleyFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View layout = inflater.inflate(R.layout.fragment_volley, container, false);
+        View layout = inflater.inflate(R.layout.fragment_rest, container, false);
         mUnbinder = ButterKnife.bind(this, layout);
         return layout;
     }
@@ -72,7 +63,7 @@ public class VolleyFragment extends Fragment {
         mCompositeDisposable.clear();
     }
 
-    @OnClick(R.id.vf_btn_volley)
+    @OnClick(R.id.vf_btn_get)
     void start() { startVolley(); }
 
     private void startVolley() {
@@ -104,7 +95,7 @@ public class VolleyFragment extends Fragment {
 
     private JSONObject getData() throws ExecutionException, InterruptedException {
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
-        String url = "http://ip.jsontest.com/";
+        String url = "http://time.jsontest.com/";
         JsonObjectRequest req = new JsonObjectRequest(url, null, future, future);
         LocalVolley.getRequestQueue().add(req);
         return future.get();

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +63,9 @@ public class MainFragment extends Fragment {
 
     @OnClick(R.id.btn_volley)
     void demoVolley() { startDemo(new VolleyFragment()); }
+
+    @OnClick(R.id.btn_okHttp)
+    void demoOkHttp() { startDemo(new OkHttpFragment()); }
 
 
     private void startDemo(@NonNull Fragment fragment) {
