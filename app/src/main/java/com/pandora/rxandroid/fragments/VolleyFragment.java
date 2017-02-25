@@ -43,7 +43,7 @@ public class VolleyFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View layout = inflater.inflate(R.layout.fragment_rest, container, false);
+        View layout = inflater.inflate(R.layout.fragment_volley, container, false);
         mUnbinder = ButterKnife.bind(this, layout);
         return layout;
     }

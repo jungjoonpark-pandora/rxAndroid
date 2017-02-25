@@ -10,7 +10,9 @@ import android.widget.ListView;
 
 import com.pandora.rxandroid.R;
 import com.pandora.rxandroid.logs.LogAdapter;
-import com.pandora.rxandroid.okHttp.Contributor;
+import com.pandora.rxandroid.square.Contributor;
+import com.pandora.rxandroid.square.GitHubServiceApi;
+import com.pandora.rxandroid.square.RestfulAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,25 +21,31 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 
 public class OkHttpFragment extends Fragment {
 
-    @BindView(R.id.vf_lv_log) ListView mLogView;
+    private static final String sName = "jungjoonpark-pandora";
+    private static final String sRepo = "rxAndroid";
+
+    @BindView(R.id.ohf_lv_log)
+    ListView mLogView;
 
     private Unbinder mUnbinder;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View layout = inflater.inflate(R.layout.fragment_rest, container, false);
+        View layout = inflater.inflate(R.layout.fragment_okhttp, container, false);
 
         mUnbinder = ButterKnife.bind(this, layout);
         return layout;
@@ -52,32 +60,39 @@ public class OkHttpFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(mUnbinder != null) {
+        if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mCompositeDisposable.clear();
     }
 
-//    https://api.github.com/repos/jungjoonpark-pandora/rxAndroid/contributors
-    @OnClick(R.id.vf_btn_get)
-    void start() { startOkHttp(); }
-
-    private void startOkHttp() {
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.github.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+    @OnClick(R.id.ohf_btn_retrofit)
+    void getRetrofit() {
+        startRetrofit();
+    }
 
 
-        GitHubService service = retrofit.create(GitHubService.class);
-        Call<List<Contributor>> call = service.repoContributors("jungjoonpark-pandora", "rxAndroid");
+    @OnClick(R.id.ohf_btn_get_retrofit_okhttp)
+    void getOkHttp() {
+        startOkHttp();
+    }
+
+    @OnClick(R.id.ohf_btn_get_retrofit_okhttp_rx)
+    void getRx() {
+        startRx();
+    }
+
+
+    /**
+     * retrofit + okHttp( Call의 내부 )
+     */
+    private void startRetrofit() {
+        GitHubServiceApi service = RestfulAdapter.getInstance().getSimpleApi();
+        Call<List<Contributor>> call = service.getCallContributors(sName, sRepo);
         call.enqueue(new Callback<List<Contributor>>() {
             @Override
             public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {
-
                 if (response.isSuccessful()) {
-                    log("isSuccessful : " + response.isSuccessful());
-
                     List<Contributor> contributors = response.body();
                     for (Contributor c : contributors) {
                         log(c.toString());
@@ -85,7 +100,6 @@ public class OkHttpFragment extends Fragment {
                 } else {
                     log("not successful");
                 }
-
             }
 
             @Override
@@ -96,18 +110,65 @@ public class OkHttpFragment extends Fragment {
     }
 
 
+    /**
+     * retrofit + okHttp
+     */
+    private void startOkHttp() {
+        GitHubServiceApi service = RestfulAdapter.getInstance().getServiceApi();
 
+        Call<List<Contributor>> call = service.getCallContributors("jungjoonpark-pandora", "rxAndroid");
+        call.enqueue(new Callback<List<Contributor>>() {
+            @Override
+            public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {
+                if (response.isSuccessful()) {
+                    List<Contributor> contributors = response.body();
+                    for (Contributor c : contributors) {
+                        log(c.toString());
+                    }
+                } else {
+                    log("not successful");
+                }
+            }
 
-
-    interface GitHubService {
-        @GET("repos/{owner}/{repo}/contributors")
-        Call<List<Contributor>> repoContributors(
-                @Path("owner") String owner,
-                @Path("repo") String rep
-        );
+            @Override
+            public void onFailure(Call<List<Contributor>> call, Throwable t) {
+                log(t.getMessage());
+            }
+        });
     }
 
 
+    /**
+     * retrofit + okHttp + rxJava
+     */
+    private void startRx() {
+        GitHubServiceApi service = RestfulAdapter.getInstance().getServiceApi();
+        Observable<List<Contributor>> observable = service.getObContributors(sName, sRepo);
+
+        mCompositeDisposable.add(observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<List<Contributor>>() {
+                    @Override
+                    public void onNext(List<Contributor> contributors) {
+                        for (Contributor c : contributors) {
+                            log(c.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        log(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        log("complete");
+                    }
+                })
+
+
+        );
+    }
 
 
     // Log
