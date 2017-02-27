@@ -1,5 +1,8 @@
 package com.pandora.rxandroid.square;
 
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -27,6 +30,9 @@ public class RestfulAdapter {
 
         HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor();
         logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        CookieManager cookieManager = new CookieManager();
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logInterceptor).build();
 
