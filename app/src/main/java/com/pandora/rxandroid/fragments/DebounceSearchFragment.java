@@ -70,42 +70,37 @@ public class DebounceSearchFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getObservable()
+        mDisposable = getObservable()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .filter(s -> !TextUtils.isEmpty(s))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getObserver());
+                .subscribeWith(getObserver());
 
         // RxView의 Library를 이용하면 간단히 TextWatcher와 같은 추가 구현이 필요 없다.
-        // RxView는 현재까지 2.x를 지원하지 못하고 있더 RxJavaInterop이용하여 변환해 준다.
-//        mDisposable = RxJavaInterop.toV2Observable(RxTextView.textChangeEvents(mSearchBox))
-//                .debounce(400, TimeUnit.MILLISECONDS)
-//                .filter(s -> !TextUtils.isEmpty(s.text().toString()))
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeWith(getObserverLib());
+        // RxView는 현재까지 2.x를 지원하지 못하고 있다. RxJavaInterop이용하여 변환해 준다.
+        mDisposable = RxJavaInterop.toV2Observable(RxTextView.textChangeEvents(mSearchBox))
+                .debounce(400, TimeUnit.MILLISECONDS)
+                .filter(s -> !TextUtils.isEmpty(s.text().toString()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(getObserverLib());
     }
 
 
     private Observable<CharSequence> getObservable() {
-        return Observable.create(new ObservableOnSubscribe<CharSequence>() {
+        return Observable.create( emitter -> mSearchBox.addTextChangedListener(new TextWatcher() {
             @Override
-            public void subscribe(ObservableEmitter<CharSequence> emitter) throws Exception {
-                mSearchBox.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        emitter.onNext(charSequence);
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable editable) {
-                    }
-                });
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
-        });
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                emitter.onNext(charSequence);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        }));
     }
 
     private DisposableObserver<CharSequence> getObserver() {

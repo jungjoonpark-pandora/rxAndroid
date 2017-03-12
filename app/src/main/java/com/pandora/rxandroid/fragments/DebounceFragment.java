@@ -75,11 +75,6 @@ public class DebounceFragment extends Fragment {
     }
 
     private Observable<View> getObservable() {
-        return Observable.create(new ObservableOnSubscribe<View>() {
-            @Override
-            public void subscribe(ObservableEmitter<View> e) throws Exception {
-                mButton.setOnClickListener(e::onNext);
-            }
-        });
+        return Observable.create(e ->  mButton.setOnClickListener(e::onNext));
     }
 }

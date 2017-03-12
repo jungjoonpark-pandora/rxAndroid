@@ -3,10 +3,10 @@ package com.pandora.rxandroid.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.pandora.rxandroid.R;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -14,13 +14,13 @@ import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import io.reactivex.observers.DisposableObserver;
 
-public class HelloActivity extends AppCompatActivity {
+public class HelloActivity extends RxAppCompatActivity {
     public static final String TAG = HelloActivity.class.getSimpleName();
 
     @BindView(R.id.tv_hello) TextView textView;
-
 
 
     private Unbinder mUnbinder;
@@ -32,29 +32,28 @@ public class HelloActivity extends AppCompatActivity {
 
         mUnbinder = ButterKnife.bind(this);
 
+//        Observer<String> observer = new DisposableObserver<String>() {
+//            @Override
+//            public void onNext(String s) { textView.setText(s);}
+//
+//            @Override
+//            public void onError(Throwable e) { }
+//
+//            @Override
+//            public void onComplete() { }
+//        };
+
+
+
         // case 1 : original
-        Observable.create(new ObservableOnSubscribe<String>() {
-                @Override
-                public void subscribe(ObservableEmitter<String> e) throws Exception {
-                    e.onNext("hello world!");
-                    e.onComplete();
-                }
-            }).subscribe(new DisposableObserver<String>() {
-                @Override
-                public void onNext(String s) {
-                    textView.setText(s);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.e(TAG, "error : " + e.getMessage());
-                }
-
-                @Override
-                public void onComplete() {
-                    Log.d(TAG, "complete.");
-                }
-            });
+//        Observable.create(
+//                new ObservableOnSubscribe<String>() {
+//                @Override
+//                public void subscribe(ObservableEmitter<String> e) throws Exception {
+//                    e.onNext("hello world!");
+//                    e.onComplete();
+//                }
+//            }).subscribe(observer);
 
 
         // case 2 : lambda
@@ -67,6 +66,11 @@ public class HelloActivity extends AppCompatActivity {
         // case 3 : other Observable creator and reference method.
 //        Observable.just("Hello, world!")
 //                .subscribe(textView::setText);
+
+        // case 4 : with rxlifecycle
+        Observable.just("Hello, rx world!")
+                .compose(bindToLifecycle())
+                .subscribe(textView::setText);
 
     }
 

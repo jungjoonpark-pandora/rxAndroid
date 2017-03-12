@@ -17,6 +17,8 @@ import com.pandora.rxandroid.logs.LogAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +27,9 @@ import hu.akarnokd.rxjava.interop.RxJavaInterop;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class OnClickFragment extends Fragment {
@@ -39,6 +43,10 @@ public class OnClickFragment extends Fragment {
     Button mButtonLambda;
     @BindView(R.id.btn_click_observer_binding)
     Button mButtonBinding;
+    @BindView(R.id.btn_click_observer_extra)
+    Button mButtonExtra;
+
+    private static final int SEVEN = 7;
 
     private Unbinder mUnbinder;
     private LogAdapter mLogAdapter;
@@ -58,9 +66,23 @@ public class OnClickFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getClickEventObservable().subscribe(getObserver());
-        getClickEventObservableWithLambda().subscribe(aVoid -> log("Clicked lambda"));
-        getClickEventObservableWithRxBinding().subscribe(aVoid -> log("Clicked rxBinding"));
+        getClickEventObservable()
+                .map(s -> "clicked")
+                .subscribe(getObserver());
+
+
+        getClickEventObservableWithLambda()
+                .map(s -> "clicked")
+                .subscribe(this::log);
+
+        getClickEventObservableWithRxBinding()
+                .subscribe(this::log);
+
+
+        getClickEventObservableExtra()
+                .map(local -> SEVEN)
+                .flatMap(this::compareNumbers)
+                .subscribe(this::log);
     }
 
     @Override
@@ -74,46 +96,46 @@ public class OnClickFragment extends Fragment {
         return Observable.create(new ObservableOnSubscribe<View>() {
             @Override
             public void subscribe(ObservableEmitter<View> e) throws Exception {
-                mButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        e.onNext(view);
-                    }
-                });
+                mButton.setOnClickListener(e::onNext);
             }
         });
     }
 
     private Observable<View> getClickEventObservableWithLambda() {
-        return Observable.create(new ObservableOnSubscribe<View>() {
-            @Override
-            public void subscribe(ObservableEmitter<View> e) throws Exception {
-                mButtonLambda.setOnClickListener(e::onNext);
-            }
-        });
+        return Observable.create(s -> mButtonLambda.setOnClickListener(s::onNext));
     }
 
-    private Observable<Void> getClickEventObservableWithRxBinding() {
-        return RxJavaInterop.toV2Observable(RxView.clicks(mButtonBinding));
+    private Observable<String> getClickEventObservableWithRxBinding() {
+        return RxJavaInterop.toV2Observable(
+                RxView.clicks(mButtonBinding)
+                        .map(s -> "Clicked Rxbinding"));
+    }
+
+    private Observable<View> getClickEventObservableExtra() {
+        return Observable.create(s -> mButtonExtra.setOnClickListener(s::onNext));
     }
 
 
-    private DisposableObserver<? super View> getObserver() {
-        return new DisposableObserver<View>() {
+    private Observable<String> compareNumbers(int input) {
+        return Observable.just(input)
+                .flatMap( in -> {
+                    Random random = new Random();
+                    int data = random.nextInt(10);
+                    return Observable.just("local : " + in, "remote : " + data, "result = " + (in == data));
+                });
+    }
+
+
+    private DisposableObserver<? super String> getObserver() {
+        return new DisposableObserver<String>() {
             @Override
-            public void onNext(View view) {
-                log("Clicked normal");
-            }
+            public void onNext(String s) { log(s); }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
+            public void onError(Throwable e) { log(e.getMessage()); }
 
             @Override
-            public void onComplete() {
-
-            }
+            public void onComplete() { log("complete"); }
         };
     }
     //        getClickEventObservable().subscribe();

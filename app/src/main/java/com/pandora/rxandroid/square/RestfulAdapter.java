@@ -31,9 +31,6 @@ public class RestfulAdapter {
         HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor();
         logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        CookieManager cookieManager = new CookieManager();
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logInterceptor).build();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -54,7 +51,4 @@ public class RestfulAdapter {
 
         return retrofit.create(GitHubServiceApi.class);
     }
-
-
-
 }

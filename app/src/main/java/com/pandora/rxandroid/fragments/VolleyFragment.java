@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +31,9 @@ import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -64,10 +69,7 @@ public class VolleyFragment extends Fragment {
     }
 
     @OnClick(R.id.vf_btn_get)
-    void start() { startVolley(); }
-
-    private void startVolley() {
-
+    void start() {
         DisposableObserver<JSONObject> observer = getObserver();
 
         mCompositeDisposable.add(getObservable()
@@ -75,6 +77,27 @@ public class VolleyFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(observer));
     }
+
+    @OnClick(R.id.vf_btn_get2)
+    void start2() {
+        DisposableObserver<JSONObject> observer = getObserver();
+
+        mCompositeDisposable.add(getObservable2()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(observer));
+    }
+
+    @OnClick(R.id.vf_btn_get3)
+    void start3() {
+        DisposableObserver<JSONObject> observer = getObserver();
+
+        mCompositeDisposable.add(getObservable3()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(observer));
+    }
+
 
     private Observable<JSONObject> getObservable() {
         return Observable.defer(new Callable<ObservableSource<? extends JSONObject>>() {
@@ -91,6 +114,26 @@ public class VolleyFragment extends Fragment {
                 }
             }
         });
+    }
+
+    // lambda expression
+    private Observable<JSONObject> getObservable2() {
+        return Observable.defer(() -> Observable.just(getData()));
+    }
+
+    // formCallable = defer + just 과 같은 효과를 제공.
+    private Observable<JSONObject> getObservable3() {
+        return Observable.fromCallable(this::getData);
+    }
+
+    {
+        Function<Integer, Observable<String>> gg = new Function<Integer, Observable<String>>() {
+            @Override
+            public Observable<String> apply(@NonNull Integer integer) throws Exception {
+                return null;
+            }
+        };
+
     }
 
     private JSONObject getData() throws ExecutionException, InterruptedException {

@@ -15,6 +15,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.observers.DisposableObserver;
 
@@ -47,6 +49,29 @@ public class HelloFragment extends Fragment {
     void start() {
         getObservable()
                 .subscribe(getObserver());
+
+        // case 1 : original
+//        Observable.create(
+//                new ObservableOnSubscribe<String>() {
+//                    @Override
+//                    public void subscribe(ObservableEmitter<String> e) throws Exception {
+//                        e.onNext("hello world!");
+//                        e.onComplete();
+//                    }
+//                }).subscribe(getObserver());
+
+
+        // case 2 : lambda
+//        Observable.<String>create(s -> {
+//            s.onNext("Hello, world!");
+//            s.onComplete();
+//        }).subscribe(o -> textView.setText(o));
+
+
+        // case 3 : other Observable creator and reference method.
+//        Observable.just("Hello, world!")
+//                .subscribe(textView::setText);
+
     }
 
     private Observable<String> getObservable() {

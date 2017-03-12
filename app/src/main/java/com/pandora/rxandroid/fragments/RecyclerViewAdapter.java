@@ -15,12 +15,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.subjects.PublishSubject;
 
-class RecyclerViewAdapter extends RecyclerView.Adapter {
-    private static final String TAG = RecyclerViewAdapter.class.getSimpleName();
+class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
 
     private List<RecyclerItem> mItems = new ArrayList<>();
     private PublishSubject<RecyclerItem> mPublishSubject;
@@ -30,18 +27,17 @@ class RecyclerViewAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_item, parent, false);
-        return new SimpleViewHolder(view);
+        return new MyViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof SimpleViewHolder) {
-            final RecyclerItem item = mItems.get(position);
-            ((SimpleViewHolder) holder).update(item);
-            ((SimpleViewHolder) holder).getClickObserver().subscribe(mPublishSubject);
-        }
+    public void onBindViewHolder(MyViewHolder holder, int position) {
+        final RecyclerItem item = mItems.get(position);
+        holder.mImage.setImageDrawable(item.getImage());
+        holder.mTitle.setText(item.getTitle());
+        holder.getClickObserver(item).subscribe(mPublishSubject);
     }
 
     @Override
@@ -57,43 +53,24 @@ class RecyclerViewAdapter extends RecyclerView.Adapter {
         mItems.add(item);
     }
 
-
     public PublishSubject<RecyclerItem> getItemPublishSubject() {
         return mPublishSubject;
     }
 
-    class SimpleViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.item_image) ImageView mImage;
-        @BindView(R.id.item_title) TextView mTitle;
 
-        RecyclerItem mRecyclerItem;
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.item_image)
+        ImageView mImage;
+        @BindView(R.id.item_title)
+        TextView mTitle;
 
-//        private final Observable<RecyclerItem> mClickObserver = Observable.create(e ->
-//                itemView.setOnClickListener(view -> e.onNext(mRecyclerItem))
-//        );
-
-        private final Observable<RecyclerItem> mClickObserver = Observable.create(new ObservableOnSubscribe<RecyclerItem>() {
-            @Override
-            public void subscribe(ObservableEmitter<RecyclerItem> e) throws Exception {
-                itemView.setOnClickListener(view -> {
-                    e.onNext(mRecyclerItem);
-                });
-            }
-        });
-
-        private SimpleViewHolder(View itemView) {
+        private MyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public Observable<RecyclerItem> getClickObserver() {
-            return mClickObserver;
-        }
-
-        public void update(RecyclerItem item) {
-            mRecyclerItem = item;
-            mImage.setImageDrawable(item.getImage());
-            mTitle.setText(item.getTitle());
+        Observable<RecyclerItem> getClickObserver(RecyclerItem item) {
+            return Observable.create(e -> itemView.setOnClickListener(view -> e.onNext(item)));
         }
     }
 }

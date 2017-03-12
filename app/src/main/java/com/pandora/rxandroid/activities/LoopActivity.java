@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.pandora.rxandroid.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +36,9 @@ public class LoopActivity extends AppCompatActivity {
     private Unbinder mUnbinder;
     private LogAdapter mLogAdapter;
     private List<String> mLogs;
-    static private List<String> samples;
+
+    Iterable<String> samples  = Arrays.asList("banana", "orange", "apple", "apple mango",
+            "melon", "watermelon");
 
 
     @Override
@@ -43,7 +46,6 @@ public class LoopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loop);
         mUnbinder = ButterKnife.bind(this);
-
 
         setupLogger();
         setSampleTitle();
@@ -58,25 +60,9 @@ public class LoopActivity extends AppCompatActivity {
         mUnbinder = null;
     }
 
-    static {
-        List<String> m = new ArrayList<>();
-        m.add("banana");
-        m.add("orange");
-        m.add("apple");
-        m.add("apple mango");
-        m.add("melon");
-        m.add("watermelon");
-        samples = Collections.unmodifiableList(m);
-    }
 
     private void setSampleTitle() {
         mTitle.append(
-                // rxJava 1.x
-//                rx.Observable.from(samples)
-//                        .reduce((r, s) -> (r + "\n") + s)
-//                        .toBlocking().single()
-
-                // rxJava 2.x
                 Observable.fromIterable(samples)
                         .reduce((r, s) -> (r + "\n") + s).blockingGet()
         );
@@ -84,10 +70,9 @@ public class LoopActivity extends AppCompatActivity {
 
 
 
-
     @OnClick(R.id.btn_loop)
     void loop() {
-        log(">>>>> getFirst :: apple");
+        log(">>>>> get an apple :: java");
         for (String s : samples) {
             if (s.contains("apple")) {
                 log(s);
@@ -98,39 +83,26 @@ public class LoopActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_loop2)
     void loop2() {
-        log(">>>>> getFirst :: apple");
+        log(">>>>> get an apple :: rx 1.x");
 
-        // rxJava 1.x
-//        rx.Observable.from(samples)
-//                .filter(s -> s.contains("android"))
-//                .firstOrDefault("Not found")
-//                .subscribe(this::log);
-
-        // rxJava 2.x
-        Observable.fromIterable(samples)
-                .skipWhile(s -> !s.contains("android"))
-//                .filter(s -> s.contains("apple"))
-                .first("Not found")
+        //rxJava 1.x
+        rx.Observable.from(samples)
+                .filter(s -> s.contains("apple"))
+                .firstOrDefault("Not found")
                 .subscribe(this::log);
     }
 
 
-//    public static <T, R> List<R> map(Function<T, R> f, List<T> list) throws Exception {
-//        List<R> result = new ArrayList<>();
-//        for (T t : list) {
-//            result.add(f.apply(t));
-//        }
-//        return result;
-//    }
-//
-//    Function<String, String> toLowerCase = String::toLowerCase;
-//
-
-
     @OnClick(R.id.btn_loop3)
     void loop3() {
+        log(">>>>> get an apple :: rx 2.x");
 
-
+        // rxJava 2.x
+        Observable.fromIterable(samples)
+                .skipWhile(s -> !s.contains("apple"))
+//                .filter(s -> s.contains("apple"))
+                .first("Not found")
+                .subscribe(this::log);
 
     }
 
