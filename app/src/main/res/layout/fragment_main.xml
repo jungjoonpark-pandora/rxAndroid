@@ -19,28 +19,10 @@
         android:text="@string/str_btn_hello"/>
 
     <Button
-        android:id="@+id/btn_scheduler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/str_btn_scheduler"/>
-
-    <Button
-        android:id="@+id/btn_polling"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/str_btn_polling"/>
-
-    <Button
         android:id="@+id/btn_click_observer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/str_btn_observer"/>
-
-    <Button
-        android:id="@+id/btn_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/str_btn_recycle"/>
 
     <Button
         android:id="@+id/btn_debounce"
@@ -55,6 +37,12 @@
         android:text="Debounce Search"/>
 
     <Button
+        android:id="@+id/btn_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_btn_recycle"/>
+
+    <Button
         android:id="@+id/btn_volley"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,5 +54,16 @@
         android:layout_height="wrap_content"
         android:text="okHttp"/>
 
+    <Button
+        android:id="@+id/btn_scheduler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_btn_scheduler"/>
+
+    <Button
+        android:id="@+id/btn_polling"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_btn_polling"/>
 
 </LinearLayout>

@@ -26,6 +26,9 @@ import io.reactivex.schedulers.Schedulers;
 
 public class PollingFragment extends Fragment {
 
+    private static final long INITIAL_DELAY = 0L;
+    private static final long PERIOD = 3L;
+
     @BindView(R.id.lv_polling_log)
     ListView mLogView;
 
@@ -59,18 +62,19 @@ public class PollingFragment extends Fragment {
 
     private void startPolling() {
 
-        Observable<String> ob = Observable.interval(3, TimeUnit.SECONDS)
-                .flatMap(o -> Observable.just("polling #1"));
+        Observable<String> ob = Observable.interval(INITIAL_DELAY, PERIOD, TimeUnit.SECONDS)
+                .flatMap(o -> Observable.just("polling #1 " + o.toString()));
 
         ob.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::log);
     }
 
+
     private void startPolling2() {
 
         Observable<String> ob2 = Observable.just("polling #2")
-                .repeatWhen(o -> o.delay(3, TimeUnit.SECONDS));
+                .repeatWhen(o -> o.delay(PERIOD, TimeUnit.SECONDS));
 
         ob2.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

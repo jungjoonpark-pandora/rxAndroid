@@ -20,9 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,9 +28,7 @@ import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -42,6 +37,7 @@ public class VolleyFragment extends Fragment {
 
     @BindView(R.id.vf_lv_log) ListView mLogView;
 
+    public static final String URL = "http://time.jsontest.com/";
     private Unbinder mUnbinder;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
@@ -69,79 +65,89 @@ public class VolleyFragment extends Fragment {
     }
 
     @OnClick(R.id.vf_btn_get)
-    void start() {
-        DisposableObserver<JSONObject> observer = getObserver();
-
-        mCompositeDisposable.add(getObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(observer));
+    void getTime() {
+        post(getObservable());
     }
 
     @OnClick(R.id.vf_btn_get2)
-    void start2() {
-        DisposableObserver<JSONObject> observer = getObserver();
-
-        mCompositeDisposable.add(getObservable2()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(observer));
+    void getTimeCallable() {
+        post(getObservableFromCallable());
     }
 
     @OnClick(R.id.vf_btn_get3)
-    void start3() {
-        DisposableObserver<JSONObject> observer = getObserver();
-
-        mCompositeDisposable.add(getObservable3()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(observer));
+    void getTimeFuture() {
+        post(getObservableFromFuture());
     }
 
 
+    private void post(Observable<JSONObject> observable) {
+        DisposableObserver<JSONObject> observer = getObserver();
+
+        mCompositeDisposable.add(
+                observable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(observer)
+        );
+    }
+
+
+    // lambda expression
     private Observable<JSONObject> getObservable() {
-        return Observable.defer(new Callable<ObservableSource<? extends JSONObject>>() {
-            @Override
-            public ObservableSource<? extends JSONObject> call() throws Exception {
-                try {
-                    return Observable.just(getData());
-                } catch (InterruptedException e) {
-                    log("error : " + e.getMessage());
-                    return Observable.error(e);
-                } catch (ExecutionException e) {
-                    log("error : " + e.getCause());
-                    return Observable.error(e.getCause());
-                }
+        return Observable.defer(() -> {
+            try {
+                return Observable.just(getData());
+            } catch (InterruptedException e) {
+                log("error : " + e.getMessage());
+                return Observable.error(e);
+            } catch (ExecutionException e) {
+                log("error : " + e.getCause());
+                return Observable.error(e.getCause());
             }
         });
     }
 
-    // lambda expression
-    private Observable<JSONObject> getObservable2() {
-        return Observable.defer(() -> Observable.just(getData()));
-    }
-
-    // formCallable = defer + just 과 같은 효과를 제공.
-    private Observable<JSONObject> getObservable3() {
+    /**
+     * public static <T> Observable<T> fromCallable(Callable<? extends T> supplier)
+     * defer + just 과 같은 효과를 제공.
+     *
+     * Returns an Observable that, when an observer subscribes to it,
+     * invokes a function you specify and then emits the value returned from that function.
+     * This allows you to defer the execution of the function you specify until an observer subscribes to the ObservableSource.
+     * That is to say, it makes the function "lazy."
+     *
+     * @return
+     */
+    private Observable<JSONObject> getObservableFromCallable() {
         return Observable.fromCallable(this::getData);
     }
 
-    {
-        Function<Integer, Observable<String>> gg = new Function<Integer, Observable<String>>() {
-            @Override
-            public Observable<String> apply(@NonNull Integer integer) throws Exception {
-                return null;
-            }
-        };
-
+    /**
+     * Converts a Future into an ObservableSource.
+     *
+     * You can convert any object that supports the Future interface into an ObservableSource
+     * that emits the return value of the Future.get() method of that object,
+     * by passing the object into the from method.
+     *
+     * Important note: This ObservableSource is blocking; you cannot dispose it.
+     */
+    private Observable<JSONObject> getObservableFromFuture() {
+        return Observable.fromFuture(getFuture());
     }
 
     private JSONObject getData() throws ExecutionException, InterruptedException {
+        return getFuture().get();
+    }
+
+
+    /**
+     * Converts the Asynchronous Request into a Synchronous Future that can be used to block via
+     * {@code Future.get()}. Observables require blocking/synchronous functions
+     */
+    private RequestFuture<JSONObject> getFuture() {
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
-        String url = "http://time.jsontest.com/";
-        JsonObjectRequest req = new JsonObjectRequest(url, null, future, future);
+        JsonObjectRequest req = new JsonObjectRequest(URL, null, future, future);
         LocalVolley.getRequestQueue().add(req);
-        return future.get();
+        return future;
     }
 
 
@@ -164,7 +170,9 @@ public class VolleyFragment extends Fragment {
         };
     }
 
-    // Log
+
+
+
     private LogAdapter mLogAdapter;
     private List<String> mLogs;
 
