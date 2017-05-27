@@ -2,7 +2,6 @@ package com.pandora.rxandroid.activities;
 
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.pandora.rxandroid.R;
@@ -14,15 +13,17 @@ import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.subscribers.DisposableSubscriber;
 
 public class HelloActivity extends RxAppCompatActivity {
     public static final String TAG = HelloActivity.class.getSimpleName();
 
     @BindView(R.id.tv_hello) TextView textView;
 
-
+    private Disposable mDisposable;
     private Unbinder mUnbinder;
 
     @Override
@@ -32,52 +33,51 @@ public class HelloActivity extends RxAppCompatActivity {
 
         mUnbinder = ButterKnife.bind(this);
 
-//        Observer<String> observer = new DisposableObserver<String>() {
+        DisposableObserver<String> observer = new DisposableObserver<String>() {
+            @Override
+            public void onNext(String s) {
+                textView.setText(s);
+            }
+            @Override
+            public void onError(Throwable e) { }
+
+            @Override
+            public void onComplete() { }
+        };
+
+//        DisposableSubscriber<String> subscriber = new DisposableSubscriber<String>() {
 //            @Override
-//            public void onNext(String s) { textView.setText(s);}
+//            public void onNext(String s) {
+//                textView.setText(s);
+//            }
 //
 //            @Override
-//            public void onError(Throwable e) { }
+//            public void onError(Throwable t) {
+//
+//            }
 //
 //            @Override
-//            public void onComplete() { }
+//            public void onComplete() {
+//
+//            }
 //        };
 
-
-
-        // case 1 : original
-//        Observable.create(
-//                new ObservableOnSubscribe<String>() {
-//                @Override
-//                public void subscribe(ObservableEmitter<String> e) throws Exception {
-//                    e.onNext("hello world!");
-//                    e.onComplete();
-//                }
-//            }).subscribe(observer);
-
-
-        // case 2 : lambda
-//        Observable.<String>create(s -> {
-//            s.onNext("Hello, world!");
-//            s.onComplete();
-//        }).subscribe(o -> textView.setText(o));
-
-
-        // case 3 : other Observable creator and reference method.
-//        Observable.just("Hello, world!")
-//                .subscribe(textView::setText);
-
-        // case 4 : with rxlifecycle
-        Observable.just("Hello, rx world!")
-                .compose(bindToLifecycle())
-                .subscribe(textView::setText);
-
+        mDisposable = Observable.create(new ObservableOnSubscribe<String>() {
+                @Override
+                public void subscribe(ObservableEmitter<String> e) throws Exception {
+                    e.onNext("hello world!");
+                    e.onComplete();
+                }
+            }).subscribeWith(observer);
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (!mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }

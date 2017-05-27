@@ -71,7 +71,6 @@ public class OkHttpFragment extends Fragment {
         startRetrofit();
     }
 
-
     @OnClick(R.id.ohf_btn_get_retrofit_okhttp)
     void getOkHttp() {
         startOkHttp();
@@ -115,8 +114,8 @@ public class OkHttpFragment extends Fragment {
      */
     private void startOkHttp() {
         GitHubServiceApi service = RestfulAdapter.getInstance().getServiceApi();
-
         Call<List<Contributor>> call = service.getCallContributors("jungjoonpark-pandora", "rxAndroid");
+
         call.enqueue(new Callback<List<Contributor>>() {
             @Override
             public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {

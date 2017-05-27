@@ -1,6 +1,7 @@
 package com.pandora.rxandroid.square;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import io.reactivex.Observable;
 import retrofit2.Call;
@@ -20,5 +21,9 @@ public interface GitHubServiceApi {
 
     @Headers({"Accept: application/vnd.github.v3.full+json"})
     @GET("repos/{owner}/{repo}/contributors")
-    Call<List<Contributor>> getCallContributorsWithHeader(@Path("owner") String owner, @Path("repo") String repo);
+    Future<List<Contributor>> getFutureContributors(@Path("owner") String owner, @Path("repo") String repo);
+
+//    @Headers({"Accept: application/vnd.github.v3.full+json"})
+//    @GET("repos/{owner}/{repo}/contributors")
+//    Call<List<Contributor>> getCallContributorsWithHeader(@Path("owner") String owner, @Path("repo") String repo);
 }
