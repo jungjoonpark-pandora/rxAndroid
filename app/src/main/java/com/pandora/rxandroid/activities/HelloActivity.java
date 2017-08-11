@@ -13,15 +13,13 @@ import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.subscribers.DisposableSubscriber;
 
 public class HelloActivity extends RxAppCompatActivity {
     public static final String TAG = HelloActivity.class.getSimpleName();
 
-    @BindView(R.id.tv_hello) TextView textView;
+    @BindView(R.id.textView) TextView textView;
 
     private Disposable mDisposable;
     private Unbinder mUnbinder;
@@ -29,7 +27,7 @@ public class HelloActivity extends RxAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hello);
+        setContentView(R.layout.activity_main);
 
         mUnbinder = ButterKnife.bind(this);
 

@@ -24,14 +24,14 @@ import io.reactivex.ObservableOnSubscribe;
 public class HelloRxAppActivity extends RxAppCompatActivity {
     public static final String TAG = HelloRxAppActivity.class.getSimpleName();
 
-    @BindView(R.id.tv_hello) TextView mTextView;
+    @BindView(R.id.textView) TextView mTextView;
 
     private Unbinder mUnbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hello);
+        setContentView(R.layout.activity_main);
 
         mUnbinder = ButterKnife.bind(this);
 
