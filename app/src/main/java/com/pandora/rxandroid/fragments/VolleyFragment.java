@@ -35,7 +35,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class VolleyFragment extends Fragment {
 
-    @BindView(R.id.vf_lv_log) ListView mLogView;
+    @BindView(R.id.vf_lv_log)
+    ListView mLogView;
 
     public static final String URL = "http://time.jsontest.com/";
     private Unbinder mUnbinder;
@@ -109,7 +110,7 @@ public class VolleyFragment extends Fragment {
     /**
      * public static <T> Observable<T> fromCallable(Callable<? extends T> supplier)
      * defer + just 과 같은 효과를 제공.
-     *
+     * <p>
      * Returns an Observable that, when an observer subscribes to it,
      * invokes a function you specify and then emits the value returned from that function.
      * This allows you to defer the execution of the function you specify until an observer subscribes to the ObservableSource.
@@ -123,16 +124,17 @@ public class VolleyFragment extends Fragment {
 
     /**
      * Converts a Future into an ObservableSource.
-     *
+     * <p>
      * You can convert any object that supports the Future interface into an ObservableSource
      * that emits the return value of the Future.get() method of that object,
      * by passing the object into the from method.
-     *
+     * <p>
      * Important note: This ObservableSource is blocking; you cannot dispose it.
      */
     private Observable<JSONObject> getObservableFromFuture() {
         return Observable.fromFuture(getFuture());
     }
+
 
     private JSONObject getData() throws ExecutionException, InterruptedException {
         return getFuture().get();
@@ -169,8 +171,6 @@ public class VolleyFragment extends Fragment {
             }
         };
     }
-
-
 
 
     private LogAdapter mLogAdapter;
