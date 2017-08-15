@@ -63,7 +63,8 @@ dependencies {
     compile 'com.trello.rxlifecycle2:rxlifecycle-android:2.0.1'
     compile 'com.trello.rxlifecycle2:rxlifecycle-components:2.0.1'
     // Utils
-    compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
+//    compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
+    compile 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
     compile 'com.jakewharton.timber:timber:4.4.0'
     // butterknife
     compile 'com.jakewharton:butterknife:8.4.0'

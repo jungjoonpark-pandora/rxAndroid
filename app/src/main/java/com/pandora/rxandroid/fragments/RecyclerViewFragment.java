@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import com.pandora.rxandroid.R;
 
+import java.util.Optional;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

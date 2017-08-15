@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.pandora.rxandroid.R;
 import com.pandora.rxandroid.logs.LogAdapter;
 
@@ -23,7 +23,6 @@ import java.util.Random;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import hu.akarnokd.rxjava.interop.RxJavaInterop;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -106,9 +105,8 @@ public class OnClickFragment extends Fragment {
     }
 
     private Observable<String> getClickEventObservableWithRxBinding() {
-        return RxJavaInterop.toV2Observable(
-                RxView.clicks(mButtonBinding)
-                        .map(s -> "Clicked Rxbinding"));
+        return RxView.clicks(mButtonBinding)
+                .map(s -> "Clicked Rxbinding");
     }
 
     private Observable<View> getClickEventObservableExtra() {

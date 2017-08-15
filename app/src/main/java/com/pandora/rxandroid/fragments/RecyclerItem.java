@@ -4,10 +4,11 @@ import android.graphics.drawable.Drawable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 class RecyclerItem {
-    Drawable image;
-    String title;
+    private Drawable image;
+    private String title;
 }
