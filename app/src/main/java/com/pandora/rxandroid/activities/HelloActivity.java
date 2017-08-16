@@ -1,27 +1,22 @@
 package com.pandora.rxandroid.activities;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import com.pandora.rxandroid.R;
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
-
-import java.util.concurrent.CompletableFuture;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 
-public class HelloActivity extends RxAppCompatActivity {
+public class HelloActivity extends Activity {
     public static final String TAG = HelloActivity.class.getSimpleName();
 
     @BindView(R.id.textView) TextView textView;

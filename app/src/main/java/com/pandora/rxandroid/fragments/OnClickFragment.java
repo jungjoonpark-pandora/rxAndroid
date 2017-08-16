@@ -1,13 +1,11 @@
 package com.pandora.rxandroid.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -17,7 +15,6 @@ import com.pandora.rxandroid.logs.LogAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import butterknife.BindView;
@@ -26,14 +23,12 @@ import butterknife.Unbinder;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 
 
 public class OnClickFragment extends Fragment {
     public static final String TAG = OnClickFragment.class.getSimpleName();
-
+    private static final int SEVEN = 7;
     @BindView(R.id.lv_log)
     ListView mLogView;
     @BindView(R.id.btn_click_observer)
@@ -44,9 +39,6 @@ public class OnClickFragment extends Fragment {
     Button mButtonBinding;
     @BindView(R.id.btn_click_observer_extra)
     Button mButtonExtra;
-
-    private static final int SEVEN = 7;
-
     private Unbinder mUnbinder;
     private LogAdapter mLogAdapter;
     private List<String> mLogs;
@@ -69,14 +61,12 @@ public class OnClickFragment extends Fragment {
                 .map(s -> "clicked")
                 .subscribe(getObserver());
 
-
         getClickEventObservableWithLambda()
                 .map(s -> "clicked lambda")
                 .subscribe(this::log);
 
         getClickEventObservableWithRxBinding()
                 .subscribe(this::log);
-
 
         getClickEventObservableExtra()
                 .map(local -> SEVEN)
