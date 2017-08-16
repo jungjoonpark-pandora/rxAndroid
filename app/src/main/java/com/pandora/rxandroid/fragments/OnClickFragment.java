@@ -71,7 +71,7 @@ public class OnClickFragment extends Fragment {
 
 
         getClickEventObservableWithLambda()
-                .map(s -> "clicked")
+                .map(s -> "clicked lambda")
                 .subscribe(this::log);
 
         getClickEventObservableWithRxBinding()

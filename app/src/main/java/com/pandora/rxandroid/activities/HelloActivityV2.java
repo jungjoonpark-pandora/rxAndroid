@@ -26,9 +26,15 @@ public class HelloActivityV2 extends RxAppCompatActivity {
 
         mUnbinder = ButterKnife.bind(this);
 
+        Observable.<String>create(s -> {
+            s.onNext("Hello, world!");
+            s.onComplete();
+        }).subscribe(o -> textView.setText(o));
+
+
         // Lambda 적용.
-        Observable.just("hello world!")
-                .subscribe(textView::setText);
+//        Observable.just("Hello, world!")
+//                .subscribe(textView::setText);
     }
 
 

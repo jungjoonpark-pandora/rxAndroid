@@ -41,6 +41,7 @@ public class HelloActivity extends RxAppCompatActivity {
             public void onNext(String s) {
                 textView.setText(s);
             }
+
             @Override
             public void onError(Throwable e) { }
 
@@ -48,35 +49,13 @@ public class HelloActivity extends RxAppCompatActivity {
             public void onComplete() { }
         };
 
-//        DisposableSubscriber<String> subscriber = new DisposableSubscriber<String>() {
-//            @Override
-//            public void onNext(String s) {
-//                textView.setText(s);
-//            }
-//
-//            @Override
-//            public void onError(Throwable t) {
-//
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//
-//            }
-//        };
-
-
         mDisposable = Observable.create(new ObservableOnSubscribe<String>() {
                 @Override
                 public void subscribe(ObservableEmitter<String> e) throws Exception {
-                    e.onNext("hello world!");
+                    e.onNext("Hello world!");
                     e.onComplete();
                 }
             }).subscribeWith(observer);
-
-        // Lambda 적용.
-//        Observable.just("hello world!")
-//                .subscribe(textView::setText);
     }
 
 
