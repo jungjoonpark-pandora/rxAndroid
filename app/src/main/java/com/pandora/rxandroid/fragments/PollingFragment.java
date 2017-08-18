@@ -53,14 +53,14 @@ public class PollingFragment extends Fragment {
     }
 
     @OnClick(R.id.btn_polling)
-    void polling() { startPolling(); }
+    void polling() { startPollingV1(); }
 
 
     @OnClick(R.id.btn_polling2)
-    void polling2() { startPolling2(); }
+    void polling2() { startPollingV2(); }
 
 
-    private void startPolling() {
+    private void startPollingV1() {
 
         Observable<String> ob = Observable.interval(INITIAL_DELAY, PERIOD, TimeUnit.SECONDS)
                 .flatMap(o -> Observable.just("polling #1 " + o.toString()));
@@ -71,7 +71,7 @@ public class PollingFragment extends Fragment {
     }
 
 
-    private void startPolling2() {
+    private void startPollingV2() {
 
         Observable<String> ob2 = Observable.just("polling #2")
                 .repeatWhen(o -> o.delay(PERIOD, TimeUnit.SECONDS));
@@ -84,7 +84,15 @@ public class PollingFragment extends Fragment {
 
     // Log
     private LogAdapter mLogAdapter;
-    private List<String> mLogs;
+    private void startPollingV2() {
+
+        Observable<String> ob2 = Observable.just("polling #2")
+                .repeatWhen(o -> o.delay(PERIOD, TimeUnit.SECONDS));
+
+        ob2.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::log);
+    }    private List<String> mLogs;
 
     private void log(String log) {
         mLogs.add(log);
