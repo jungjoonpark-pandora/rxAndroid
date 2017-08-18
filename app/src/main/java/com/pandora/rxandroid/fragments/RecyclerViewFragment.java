@@ -17,8 +17,6 @@ import android.widget.Toast;
 
 import com.pandora.rxandroid.R;
 
-import java.util.Optional;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -95,7 +93,7 @@ public class RecyclerViewFragment extends Fragment {
                 .map(item -> {
                     Drawable image = item.activityInfo.loadIcon(pm);
                     String title = item.activityInfo.loadLabel(pm).toString();
-                    return new RecyclerItem(image, title);
+                    return RecyclerItem.of(image, title);
                 });
     }
 

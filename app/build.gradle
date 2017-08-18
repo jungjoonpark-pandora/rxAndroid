@@ -11,6 +11,7 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'me.tatarka.retrolambda'
 
+
 ext {
     sdkVersion= 24
     supportLibVersion= "24.2.1"
