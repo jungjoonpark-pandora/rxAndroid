@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
@@ -26,7 +25,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
@@ -35,12 +33,13 @@ import io.reactivex.schedulers.Schedulers;
 
 public class VolleyFragment extends Fragment {
 
+    public static final String URL = "http://time.jsontest.com/";
     @BindView(R.id.vf_lv_log)
     ListView mLogView;
-
-    public static final String URL = "http://time.jsontest.com/";
     private Unbinder mUnbinder;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private LogAdapter mLogAdapter;
+    private List<String> mLogs;
 
     @Nullable
     @Override
@@ -80,7 +79,6 @@ public class VolleyFragment extends Fragment {
         post(getObservableFromFuture());
     }
 
-
     private void post(Observable<JSONObject> observable) {
         DisposableObserver<JSONObject> observer = getObserver();
 
@@ -90,7 +88,6 @@ public class VolleyFragment extends Fragment {
                         .subscribeWith(observer)
         );
     }
-
 
     // lambda expression
     private Observable<JSONObject> getObservable() {
@@ -135,15 +132,14 @@ public class VolleyFragment extends Fragment {
         return Observable.fromFuture(getFuture());
     }
 
-
     private JSONObject getData() throws ExecutionException, InterruptedException {
         return getFuture().get();
     }
 
-
     /**
      * Converts the Asynchronous Request into a Synchronous Future that can be used to block via
      * {@code Future.get()}. Observables require blocking/synchronous functions
+     * 2. Request Object생성 3.RequestQueue에 추가 4. Callback 등록
      */
     private RequestFuture<JSONObject> getFuture() {
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
@@ -151,7 +147,6 @@ public class VolleyFragment extends Fragment {
         LocalVolley.getRequestQueue().add(req);
         return future;
     }
-
 
     private DisposableObserver<JSONObject> getObserver() {
         return new DisposableObserver<JSONObject>() {
@@ -171,10 +166,6 @@ public class VolleyFragment extends Fragment {
             }
         };
     }
-
-
-    private LogAdapter mLogAdapter;
-    private List<String> mLogs;
 
     private void log(String log) {
         mLogs.add(log);
